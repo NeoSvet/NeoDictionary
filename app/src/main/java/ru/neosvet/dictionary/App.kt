@@ -1,15 +1,19 @@
 package ru.neosvet.dictionary
 
 import android.app.Application
+import androidx.lifecycle.MutableLiveData
+import ru.neosvet.dictionary.data.DictionarySource
 import ru.neosvet.dictionary.data.MainSource
 import ru.neosvet.dictionary.data.client.Client
 import ru.neosvet.dictionary.entries.DicStrings
+import ru.neosvet.dictionary.entries.ModelResult
 import ru.neosvet.dictionary.presenter.DictionaryPresenter
 import ru.neosvet.dictionary.presenter.ListPresenter
 import ru.neosvet.dictionary.presenter.MainPresenter
 
 class App : Application() {
-    lateinit var dictionary: DictionaryPresenter
+    val liveResult: MutableLiveData<ModelResult> = MutableLiveData()
+    lateinit var source: DictionarySource
 
     override fun onCreate() {
         super.onCreate()
@@ -24,9 +28,7 @@ class App : Application() {
             synonyms = getString(R.string.synonyms),
             antonyms = getString(R.string.antonyms)
         )
-        val source = MainSource(Client.instance, strings)
-        val list = ListPresenter()
-        dictionary = MainPresenter(source, list)
+        source = MainSource(Client.instance, strings)
     }
 
     companion object {

@@ -9,28 +9,29 @@ import ru.neosvet.dictionary.R
 import ru.neosvet.dictionary.databinding.ItemLabelBinding
 import ru.neosvet.dictionary.databinding.ItemTitleBinding
 import ru.neosvet.dictionary.entries.ResultItem
-import ru.neosvet.dictionary.presenter.IListPresenter
 
 class MainAdapter(
-    private val presenter: IListPresenter
+    private val onItemClickListener: ((ResultItem) -> Unit),
+    private val data: List<ResultItem>
 ) : RecyclerView.Adapter<MainAdapter.ViewHolder>() {
     private val TYPE_TITLE = 0
     private val TYPE_LABEL = 1
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), ListView {
-        override var pos = -1
-
-        override fun setItem(item: ResultItem) {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun setItem(item: ResultItem) {
             val tv = itemView.findViewById(R.id.tv_item) as TextView
             if (item.title != null)
                 tv.text = item.title
             else
                 tv.text = item.description
+            item.url?.let {
+                itemView.setOnClickListener { onItemClickListener.invoke(item) }
+            }
         }
     }
 
     override fun getItemViewType(position: Int) =
-        if (presenter.isTitle(position))
+        if (data[position].title != null)
             TYPE_TITLE
         else
             TYPE_LABEL
@@ -52,13 +53,11 @@ class MainAdapter(
                         parent,
                         false
                     ).root
-                ).apply {
-                    itemView.setOnClickListener { presenter.itemClickListener?.invoke(this) }
-                }
+                )
         }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-        presenter.bindView(holder.apply { pos = position })
+        holder.setItem(data[position])
 
-    override fun getItemCount() = presenter.getCount()
+    override fun getItemCount() = data.size
 }
