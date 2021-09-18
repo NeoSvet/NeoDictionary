@@ -1,13 +1,19 @@
 package ru.neosvet.dictionary.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.neosvet.dictionary.App
 import ru.neosvet.dictionary.Schedulers
 import ru.neosvet.dictionary.entries.ErrorResult
 import ru.neosvet.dictionary.entries.ListResult
+import ru.neosvet.dictionary.entries.ModelResult
 import ru.neosvet.dictionary.entries.ResultItem
 
 class DictionaryViewModel : ViewModel(), IDictionaryViewModel {
+    private val _result: MutableLiveData<ModelResult> = MutableLiveData()
+    override val result: LiveData<ModelResult>
+        get() = _result
     override var word: String? = null
         private set
 
@@ -24,7 +30,7 @@ class DictionaryViewModel : ViewModel(), IDictionaryViewModel {
     }
 
     private fun onSuccess(list: List<ResultItem>) {
-        App.instance.liveResult.postValue(
+        _result.postValue(
             ListResult(
                 list = list
             )
@@ -33,7 +39,7 @@ class DictionaryViewModel : ViewModel(), IDictionaryViewModel {
 
     private fun onError(t: Throwable) {
         t.printStackTrace()
-        App.instance.liveResult.postValue(
+        _result.postValue(
             ErrorResult(
                 error = t
             )

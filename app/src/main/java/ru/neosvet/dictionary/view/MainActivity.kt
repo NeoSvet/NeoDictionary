@@ -12,13 +12,12 @@ import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
-import ru.neosvet.dictionary.App
 import ru.neosvet.dictionary.R
 import ru.neosvet.dictionary.databinding.ActivityMainBinding
 import ru.neosvet.dictionary.entries.*
 import ru.neosvet.dictionary.view.list.MainAdapter
-import ru.neosvet.dictionary.viewmodel.IDictionaryViewModel
 import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
+import ru.neosvet.dictionary.viewmodel.IDictionaryViewModel
 
 class MainActivity : AppCompatActivity() {
     private val model: IDictionaryViewModel by lazy {
@@ -52,11 +51,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        App.instance.liveResult.observe(this, resultObserver)
+        model.result.observe(this, resultObserver)
     }
 
     override fun onPause() {
-        App.instance.liveResult.removeObserver(resultObserver)
+        model.result.removeObserver(resultObserver)
         super.onPause()
     }
 

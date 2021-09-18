@@ -1,15 +1,12 @@
 package ru.neosvet.dictionary
 
 import android.app.Application
-import androidx.lifecycle.MutableLiveData
-import ru.neosvet.dictionary.data.IDictionarySource
 import ru.neosvet.dictionary.data.DictionarySource
+import ru.neosvet.dictionary.data.IDictionarySource
 import ru.neosvet.dictionary.data.client.Client
 import ru.neosvet.dictionary.entries.DicStrings
-import ru.neosvet.dictionary.entries.ModelResult
 
 class App : Application() {
-    val liveResult: MutableLiveData<ModelResult> = MutableLiveData()
     lateinit var source: IDictionarySource
 
     override fun onCreate() {
