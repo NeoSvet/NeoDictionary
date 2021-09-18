@@ -16,13 +16,11 @@ import ru.neosvet.dictionary.App
 import ru.neosvet.dictionary.R
 import ru.neosvet.dictionary.databinding.ActivityMainBinding
 import ru.neosvet.dictionary.entries.*
-import ru.neosvet.dictionary.presenter.ListPresenter
-import ru.neosvet.dictionary.view.list.ListView
 import ru.neosvet.dictionary.view.list.MainAdapter
 import ru.neosvet.dictionary.viewmodel.DictionaryModel
 import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
 
-class MainActivity : AppCompatActivity(), Observer<ModelResult> {
+class MainActivity : AppCompatActivity() {
     private val model: DictionaryModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(DictionaryViewModel::class.java)
     }
@@ -39,6 +37,12 @@ class MainActivity : AppCompatActivity(), Observer<ModelResult> {
                 openUrl("http:$it")
         }
     }
+    private val resultObserver = Observer<ModelResult> { result ->
+        when (result.state) {
+            StateResult.LIST -> onList(result as ListResult)
+            StateResult.ERROR -> onError(result as ErrorResult)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,11 +52,11 @@ class MainActivity : AppCompatActivity(), Observer<ModelResult> {
 
     override fun onResume() {
         super.onResume()
-        App.instance.liveResult.observe(this, this)
+        App.instance.liveResult.observe(this, resultObserver)
     }
 
     override fun onPause() {
-        App.instance.liveResult.removeObserver(this)
+        App.instance.liveResult.removeObserver(resultObserver)
         super.onPause()
     }
 
@@ -121,12 +125,5 @@ class MainActivity : AppCompatActivity(), Observer<ModelResult> {
             binding.rvMain, msg, Snackbar.LENGTH_INDEFINITE
         )
         errorBar?.show()
-    }
-
-    override fun onChanged(result: ModelResult) {
-        when (result.state) {
-            StateResult.LIST -> onList(result as ListResult)
-            StateResult.ERROR -> onError(result as ErrorResult)
-        }
     }
 }
