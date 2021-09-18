@@ -7,7 +7,7 @@ import ru.neosvet.dictionary.entries.ErrorResult
 import ru.neosvet.dictionary.entries.ListResult
 import ru.neosvet.dictionary.entries.ResultItem
 
-class DictionaryViewModel : ViewModel(), DictionaryModel {
+class DictionaryViewModel : ViewModel(), IDictionaryViewModel {
     override var word: String? = null
         private set
 

@@ -1,6 +1,6 @@
 package ru.neosvet.dictionary.viewmodel
 
-interface DictionaryModel {
+interface IDictionaryViewModel {
     val word: String?
     fun searchWord(word: String, language: String)
 }

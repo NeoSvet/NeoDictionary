@@ -17,11 +17,11 @@ import ru.neosvet.dictionary.R
 import ru.neosvet.dictionary.databinding.ActivityMainBinding
 import ru.neosvet.dictionary.entries.*
 import ru.neosvet.dictionary.view.list.MainAdapter
-import ru.neosvet.dictionary.viewmodel.DictionaryModel
+import ru.neosvet.dictionary.viewmodel.IDictionaryViewModel
 import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
 
 class MainActivity : AppCompatActivity() {
-    private val model: DictionaryModel by lazy {
+    private val model: IDictionaryViewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(DictionaryViewModel::class.java)
     }
     private lateinit var binding: ActivityMainBinding
