@@ -10,19 +10,16 @@ import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
+import org.koin.android.ext.android.inject
 import ru.neosvet.dictionary.R
 import ru.neosvet.dictionary.databinding.ActivityMainBinding
 import ru.neosvet.dictionary.entries.*
 import ru.neosvet.dictionary.view.list.MainAdapter
 import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
-import ru.neosvet.dictionary.viewmodel.IDictionaryViewModel
 
 class MainActivity : AppCompatActivity() {
-    private val model: IDictionaryViewModel by lazy {
-        ViewModelProvider.NewInstanceFactory().create(DictionaryViewModel::class.java)
-    }
+    private val model: DictionaryViewModel by inject()
     private lateinit var binding: ActivityMainBinding
     private val imm: InputMethodManager by lazy {
         getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
