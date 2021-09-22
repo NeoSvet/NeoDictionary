@@ -5,12 +5,17 @@ interface ModelResult {
 }
 
 enum class StateResult {
-    LIST, ERROR
+    LIST, WORDS, ERROR
 }
 
 data class ListResult(
     override val state: StateResult = StateResult.LIST,
     val list: List<ResultItem>
+) : ModelResult
+
+data class WordsResult(
+    override val state: StateResult = StateResult.WORDS,
+    val words: List<WordItem>
 ) : ModelResult
 
 data class ErrorResult(

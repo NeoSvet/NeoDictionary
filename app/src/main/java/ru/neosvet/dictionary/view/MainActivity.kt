@@ -1,5 +1,6 @@
 package ru.neosvet.dictionary.view
 
+import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Filter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
@@ -16,6 +18,7 @@ import ru.neosvet.dictionary.R
 import ru.neosvet.dictionary.databinding.ActivityMainBinding
 import ru.neosvet.dictionary.entries.*
 import ru.neosvet.dictionary.view.list.MainAdapter
+import ru.neosvet.dictionary.view.list.WordsAdapter
 import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -33,10 +36,33 @@ class MainActivity : AppCompatActivity() {
                 openUrl("http:$it")
         }
     }
+    private val onWordClickListener: ((WordItem, WordsAdapter.Event) -> Unit) = { word, event ->
+        when (event) {
+            WordsAdapter.Event.OPEN -> model.openWord(word.id)
+            WordsAdapter.Event.DELETE -> {
+                adWords.removeWord(word)
+                model.deleteWord(word.id)
+            }
+        }
+    }
     private val resultObserver = Observer<ModelResult> { result ->
         when (result.state) {
             StateResult.LIST -> onList(result as ListResult)
+            StateResult.WORDS -> onWords(result as WordsResult)
             StateResult.ERROR -> onError(result as ErrorResult)
+        }
+    }
+    private lateinit var adWords: WordsAdapter
+    private val wordsFilter = object : Filter() {
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
+            val results = FilterResults()
+            if (constraint.isNullOrEmpty()) return results
+            val s = constraint.toString().lowercase()
+            model.getWords(s)
+            return results
+        }
+
+        override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
         }
     }
 
@@ -59,11 +85,32 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main, menu)
 
-        val search = menu?.findItem(R.id.search)?.actionView as SearchView
-        search.queryHint = getString(R.string.query_hint)
-        search.isSubmitButtonEnabled = true
+        menu?.findItem(R.id.search)?.actionView?.let {
+            initSearchView(it)
+        }
 
-        search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun initSearchView(view: View) {
+        val searchView = view as SearchView
+        searchView.queryHint = getString(R.string.query_hint)
+        searchView.isSubmitButtonEnabled = true
+
+        val searchAutoComplete =
+            searchView.findViewById(androidx.appcompat.R.id.search_src_text) as SearchView.SearchAutoComplete
+        val searchManager: SearchManager = getSystemService(SEARCH_SERVICE) as SearchManager
+        searchView.setSearchableInfo(
+            searchManager.getSearchableInfo(componentName)
+        )
+        adWords = WordsAdapter(
+            context = this,
+            onItemClickListener = onWordClickListener,
+            filter = wordsFilter
+        )
+        searchAutoComplete.setAdapter(adWords)
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 model.searchWord(query, detectLanguage())
                 return false
@@ -75,10 +122,8 @@ class MainActivity : AppCompatActivity() {
         })
 
         model.word?.let {
-            search.setQuery(it, false)
+            searchView.setQuery(it, false)
         }
-
-        return super.onCreateOptionsMenu(menu)
     }
 
     private fun detectLanguage(): String {
@@ -107,6 +152,10 @@ class MainActivity : AppCompatActivity() {
         )
         binding.rvMain.adapter = adapter
         adapter.notifyDataSetChanged()
+    }
+
+    private fun onWords(result: WordsResult) {
+        adWords.addWords(result.words.toMutableList())
     }
 
     private fun onError(result: ErrorResult) {

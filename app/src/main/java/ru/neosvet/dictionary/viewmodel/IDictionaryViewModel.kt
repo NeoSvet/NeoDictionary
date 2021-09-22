@@ -7,4 +7,7 @@ interface IDictionaryViewModel {
     val result: LiveData<ModelResult>
     val word: String?
     fun searchWord(word: String, language: String)
+    fun getWords(constraint: String)
+    fun openWord(wordId: Int)
+    fun deleteWord(wordId: Int)
 }

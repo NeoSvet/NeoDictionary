@@ -2,6 +2,7 @@ package ru.neosvet.dictionary
 
 import android.app.Application
 import org.koin.core.context.startKoin
+import ru.neosvet.dictionary.data.storage.DicStorage
 import ru.neosvet.dictionary.di.KoinModule
 import ru.neosvet.dictionary.entries.DicStrings
 
@@ -18,8 +19,9 @@ class App : Application() {
             synonyms = getString(R.string.synonyms),
             antonyms = getString(R.string.antonyms)
         )
+        val storage = DicStorage.get(applicationContext)
         startKoin {
-            modules(KoinModule.create(strings))
+            modules(KoinModule.create(strings, storage))
         }
     }
 }
