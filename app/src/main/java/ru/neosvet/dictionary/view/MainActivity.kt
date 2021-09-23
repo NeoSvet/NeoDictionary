@@ -4,6 +4,7 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
@@ -127,7 +128,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun detectLanguage(): String {
-        val lang = imm.currentInputMethodSubtype.locale
+        val type = imm.currentInputMethodSubtype
+        var lang: String
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            lang = type.languageTag
+            if (lang.isEmpty())
+                lang = type.locale
+        } else
+            lang = type.locale
+        if (lang.length > 2)
+            lang = lang.substring(0, 2)
         if (lang.isEmpty() || lang == "zz")
             return "en"
         return lang
