@@ -46,11 +46,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    private val resultObserver = Observer<ModelResult> { result ->
+    private val resultObserver = Observer<DictionaryState.Model> { result ->
         when (result.state) {
-            StateResult.LIST -> onList(result as ListResult)
-            StateResult.WORDS -> onWords(result as WordsResult)
-            StateResult.ERROR -> onError(result as ErrorResult)
+            DictionaryState.State.RESULTS -> onList(result as  DictionaryState.Results)
+            DictionaryState.State.WORDS -> onWords(result as  DictionaryState.Words)
+            DictionaryState.State.ERROR -> onError(result as  DictionaryState.Error)
         }
     }
     private lateinit var adWords: WordsAdapter
@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onList(result: ListResult) {
+    private fun onList(result:  DictionaryState.Results) {
         errorBar?.dismiss()
         binding.tvWelcome.visibility = View.GONE
         val adapter = MainAdapter(
@@ -164,11 +164,11 @@ class MainActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
     }
 
-    private fun onWords(result: WordsResult) {
+    private fun onWords(result:  DictionaryState.Words) {
         adWords.addWords(result.words.toMutableList())
     }
 
-    private fun onError(result: ErrorResult) {
+    private fun onError(result:  DictionaryState.Error) {
         var msg = result.error.message
         if (msg == null)
             msg = getString(R.string.unknown_error)

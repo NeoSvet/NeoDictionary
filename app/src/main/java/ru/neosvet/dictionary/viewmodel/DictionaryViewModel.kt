@@ -16,8 +16,8 @@ class DictionaryViewModel(
     private val source: IDictionarySource,
     private val storage: DicStorage
 ) : ViewModel(), IDictionaryViewModel {
-    private val _result: MutableLiveData<ModelResult> = MutableLiveData()
-    override val result: LiveData<ModelResult>
+    private val _result: MutableLiveData<DictionaryState.Model> = MutableLiveData()
+    override val result: LiveData<DictionaryState.Model>
         get() = _result
     override var word: String? = null
         private set
@@ -45,7 +45,7 @@ class DictionaryViewModel(
         scope.launch {
             val words = storage.wordDao.getAll("%$constraint%")
             _result.postValue(
-                WordsResult(
+                DictionaryState.Words(
                     words = words
                 )
             )
@@ -66,7 +66,7 @@ class DictionaryViewModel(
                 )
             }
             _result.postValue(
-                ListResult(
+                DictionaryState.Results(
                     list = list
                 )
             )
@@ -93,7 +93,7 @@ class DictionaryViewModel(
     private fun onSuccess(list: List<ResultItem>) {
         saveResult(list)
         _result.postValue(
-            ListResult(
+            DictionaryState.Results(
                 list = list
             )
         )
@@ -123,7 +123,7 @@ class DictionaryViewModel(
     private fun onError(t: Throwable) {
         t.printStackTrace()
         _result.postValue(
-            ErrorResult(
+            DictionaryState.Error(
                 error = t
             )
         )
