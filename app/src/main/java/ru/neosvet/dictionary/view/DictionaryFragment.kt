@@ -7,22 +7,24 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
 import android.widget.Filter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.github.terrakok.cicerone.Router
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
 import ru.neosvet.dictionary.R
+import ru.neosvet.dictionary.databinding.FragmentDictionaryBinding
 import ru.neosvet.dictionary.entries.DictionaryState
 import ru.neosvet.dictionary.entries.ResultItem
 import ru.neosvet.dictionary.entries.WordItem
 import ru.neosvet.dictionary.view.list.MainAdapter
 import ru.neosvet.dictionary.view.list.WordsAdapter
+import ru.neosvet.dictionary.view.screens.HistoryScreen
 import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
-import ru.neosvet.dictionary.databinding.FragmentDictionaryBinding
 
 class DictionaryFragment : Fragment() {
     companion object {
@@ -37,6 +39,7 @@ class DictionaryFragment : Fragment() {
     }
 
     private var binding: FragmentDictionaryBinding? = null
+    private val router: Router by inject()
     private val model: DictionaryViewModel by inject()
     private val imm: InputMethodManager by lazy {
         requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -117,6 +120,13 @@ class DictionaryFragment : Fragment() {
         inflater.inflate(R.menu.main, menu)
         initSearchView(menu.findItem(R.id.search).actionView)
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.history) {
+            router.navigateTo(HistoryScreen.create())
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun initSearchView(view: View) {
