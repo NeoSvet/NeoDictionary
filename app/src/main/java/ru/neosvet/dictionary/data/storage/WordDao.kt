@@ -20,7 +20,7 @@ interface WordDao {
     @Query("SELECT * FROM Word")
     fun getAll(): List<WordItem>
 
-    @Query("SELECT * FROM Word WHERE word LIKE :constraint") //or LIKE '%' || :constraint || '%'
+    @Query("SELECT * FROM Word WHERE word LIKE :constraint ORDER BY time DESC") //or LIKE '%' || :constraint || '%'
     fun getAll(constraint: String): List<WordItem>
 
     @Query("SELECT * FROM Word WHERE word=:word")

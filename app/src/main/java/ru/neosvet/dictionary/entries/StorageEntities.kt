@@ -2,12 +2,16 @@ package ru.neosvet.dictionary.entries
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "Word")
+@Entity(tableName = "Word",
+   indices = [Index(value = ["word"], unique = true)]
+)
 data class WordItem(
-    @PrimaryKey(autoGenerate = true) val id: Int,
-    val word: String
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val word: String,
+    val time: Long = 0
 )
 
 @Entity(

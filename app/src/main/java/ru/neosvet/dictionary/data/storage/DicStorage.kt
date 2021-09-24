@@ -11,7 +11,7 @@ import ru.neosvet.dictionary.entries.WordItem
         WordItem::class,
         InfoItem::class
     ],
-    version = 1
+    version = 2
 )
 abstract class DicStorage : RoomDatabase() {
     abstract val wordDao: WordDao
@@ -22,6 +22,7 @@ abstract class DicStorage : RoomDatabase() {
 
         fun get(context: Context) =
             Room.databaseBuilder(context, DicStorage::class.java, DB_NAME)
+                .addMigrations(Storage1to2Migration)
                 .build()
     }
 }

@@ -81,8 +81,12 @@ class DictionaryViewModel(
 
     private fun saveWord(word: String) {
         scope.launch {
-            if (storage.wordDao.get(word) == null)
-                storage.wordDao.insert(WordItem(0, word))
+            storage.wordDao.insert(
+                WordItem(
+                    word = word,
+                    time = System.currentTimeMillis()
+                )
+            )
         }
     }
 
