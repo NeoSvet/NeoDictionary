@@ -28,13 +28,14 @@ import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
 
 class DictionaryFragment : Fragment() {
     companion object {
-        private const val ARG_WORD_ID = "wordId"
-        fun newInstance(wordId: Int = 0) =
+        private const val ARG_WORD = "word"
+        fun newInstance(word: WordItem?) =
             DictionaryFragment().apply {
-                if (wordId > 0)
+                word?.let {
                     arguments = Bundle().apply {
-                        putInt(ARG_WORD_ID, wordId)
+                        putParcelable(ARG_WORD, it)
                     }
+                }
             }
     }
 
@@ -55,7 +56,7 @@ class DictionaryFragment : Fragment() {
     }
     private val onWordClickListener: ((WordItem, WordsAdapter.Event) -> Unit) = { word, event ->
         when (event) {
-            WordsAdapter.Event.OPEN -> model.openWord(word.id)
+            WordsAdapter.Event.OPEN -> model.openWord(word)
             WordsAdapter.Event.DELETE -> {
                 adWords.removeWord(word)
                 model.deleteWord(word.id)
@@ -95,9 +96,10 @@ class DictionaryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         arguments?.let {
-            val id = it.getInt(ARG_WORD_ID)
-            if (id > 0)
-                model.openWord(id)
+            val word = it.getParcelable(ARG_WORD) as WordItem?
+            word?.let {
+                model.openWord(it)
+            }
         }
     }
 

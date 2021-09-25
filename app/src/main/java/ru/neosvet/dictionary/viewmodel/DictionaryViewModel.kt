@@ -49,9 +49,10 @@ class DictionaryViewModel(
         }
     }
 
-    override fun openWord(wordId: Int) {
+    override fun openWord(word: WordItem) {
+        this.word = word.word
         scope.launch {
-            val info = storage.infoDao.get(wordId)
+            val info = storage.infoDao.get(word.id)
             val list = mutableListOf<ResultItem>()
             info.forEach {
                 list.add(

@@ -82,7 +82,7 @@ class HistoryFragment : Fragment() {
 
     private fun openWord(item: WordItem) {
         router.exit()
-        router.replaceScreen(DictionaryScreen.create(item.id))
+        router.replaceScreen(DictionaryScreen.create(item))
     }
 
     private fun deleteWord(item: WordItem) {
