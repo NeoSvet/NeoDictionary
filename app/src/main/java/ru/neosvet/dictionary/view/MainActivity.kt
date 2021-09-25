@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        router.replaceScreen(DictionaryScreen.create())
+        router.newRootScreen(DictionaryScreen.create())
     }
 
     override fun onResumeFragments() {
