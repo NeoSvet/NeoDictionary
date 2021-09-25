@@ -7,41 +7,56 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
-import ru.neosvet.dictionary.App
 import ru.neosvet.dictionary.R
-import ru.neosvet.dictionary.presenter.DictionaryPresenter
-import ru.neosvet.dictionary.presenter.IListPresenter
+import ru.neosvet.dictionary.databinding.ActivityMainBinding
+import ru.neosvet.dictionary.entries.*
 import ru.neosvet.dictionary.view.list.MainAdapter
+import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
+import ru.neosvet.dictionary.viewmodel.IDictionaryViewModel
 
-class MainActivity : AppCompatActivity(), DictionaryView {
-    private val presenter: DictionaryPresenter by lazy {
-        App.instance.dictionary
+class MainActivity : AppCompatActivity() {
+    private val model: IDictionaryViewModel by lazy {
+        ViewModelProvider.NewInstanceFactory().create(DictionaryViewModel::class.java)
     }
-    private val rvMain: RecyclerView by lazy {
-        findViewById(R.id.rv_main)
-    }
-    private val tvWelcome: TextView by lazy {
-        findViewById(R.id.tv_welcome)
-    }
+    private lateinit var binding: ActivityMainBinding
     private val imm: InputMethodManager by lazy {
         getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
     private var errorBar: Snackbar? = null
+    private val onItemClickListener: ((ResultItem) -> Unit) = { item ->
+        item.url?.let {
+            if (it.indexOf("http") == 0)
+                openUrl(it)
+            else
+                openUrl("http:$it")
+        }
+    }
+    private val resultObserver = Observer<ModelResult> { result ->
+        when (result.state) {
+            StateResult.LIST -> onList(result as ListResult)
+            StateResult.ERROR -> onError(result as ErrorResult)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        presenter.attachView(this)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
     }
 
-    override fun onDestroy() {
-        presenter.detachView()
-        super.onDestroy()
+    override fun onResume() {
+        super.onResume()
+        model.result.observe(this, resultObserver)
+    }
+
+    override fun onPause() {
+        model.result.removeObserver(resultObserver)
+        super.onPause()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -53,7 +68,7 @@ class MainActivity : AppCompatActivity(), DictionaryView {
 
         search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                presenter.searchWord(query, detectLanguage())
+                model.searchWord(query, detectLanguage())
                 return false
             }
 
@@ -62,7 +77,7 @@ class MainActivity : AppCompatActivity(), DictionaryView {
             }
         })
 
-        presenter.word?.let {
+        model.word?.let {
             search.setQuery(it, false)
         }
 
@@ -76,7 +91,7 @@ class MainActivity : AppCompatActivity(), DictionaryView {
         return lang
     }
 
-    override fun openUrl(url: String) {
+    private fun openUrl(url: String) {
         try {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.setData(Uri.parse(url))
@@ -86,16 +101,19 @@ class MainActivity : AppCompatActivity(), DictionaryView {
         }
     }
 
-    override fun updateList(list: IListPresenter) {
+    private fun onList(result: ListResult) {
         errorBar?.dismiss()
-        tvWelcome.visibility = View.GONE
-        val adapter = MainAdapter(list)
-        rvMain.adapter = adapter
+        binding.tvWelcome.visibility = View.GONE
+        val adapter = MainAdapter(
+            onItemClickListener = onItemClickListener,
+            data = result.list
+        )
+        binding.rvMain.adapter = adapter
         adapter.notifyDataSetChanged()
     }
 
-    override fun onError(t: Throwable) {
-        var msg = t.message
+    private fun onError(result: ErrorResult) {
+        var msg = result.error.message
         if (msg == null)
             msg = getString(R.string.unknown_error)
         else if (msg.contains("HTTP 404"))
@@ -103,7 +121,7 @@ class MainActivity : AppCompatActivity(), DictionaryView {
         else
             msg = getString(R.string.error) + ": " + msg
         errorBar = Snackbar.make(
-            rvMain, msg, Snackbar.LENGTH_INDEFINITE
+            binding.rvMain, msg, Snackbar.LENGTH_INDEFINITE
         )
         errorBar?.show()
     }

@@ -1,15 +1,13 @@
 package ru.neosvet.dictionary
 
 import android.app.Application
-import ru.neosvet.dictionary.data.MainSource
+import ru.neosvet.dictionary.data.DictionarySource
+import ru.neosvet.dictionary.data.IDictionarySource
 import ru.neosvet.dictionary.data.client.Client
 import ru.neosvet.dictionary.entries.DicStrings
-import ru.neosvet.dictionary.presenter.DictionaryPresenter
-import ru.neosvet.dictionary.presenter.ListPresenter
-import ru.neosvet.dictionary.presenter.MainPresenter
 
 class App : Application() {
-    lateinit var dictionary: DictionaryPresenter
+    lateinit var source: IDictionarySource
 
     override fun onCreate() {
         super.onCreate()
@@ -24,9 +22,7 @@ class App : Application() {
             synonyms = getString(R.string.synonyms),
             antonyms = getString(R.string.antonyms)
         )
-        val source = MainSource(Client.instance, strings)
-        val list = ListPresenter()
-        dictionary = MainPresenter(source, list)
+        source = DictionarySource(Client.instance, strings)
     }
 
     companion object {

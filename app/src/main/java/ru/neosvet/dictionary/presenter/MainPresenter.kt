@@ -1,12 +1,12 @@
 package ru.neosvet.dictionary.presenter
 
 import ru.neosvet.dictionary.Schedulers
-import ru.neosvet.dictionary.data.DictionarySource
+import ru.neosvet.dictionary.data.IDictionarySource
 import ru.neosvet.dictionary.entries.ResultItem
 import ru.neosvet.dictionary.view.DictionaryView
 
 class MainPresenter(
-    private val source: DictionarySource,
+    private val source: IDictionarySource,
     private val list: IListPresenter
 ) : DictionaryPresenter {
     private var view: DictionaryView? = null
