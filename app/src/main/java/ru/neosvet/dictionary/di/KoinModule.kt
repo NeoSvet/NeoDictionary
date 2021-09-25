@@ -7,8 +7,8 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import ru.neosvet.dictionary.data.DictionarySource
 import ru.neosvet.dictionary.data.IDictionarySource
-import ru.neosvet.dictionary.data.client.Client
-import ru.neosvet.dictionary.data.client.IClient
+import ru.neosvet.dictionary.data.client.DicClient
+import ru.neosvet.dictionary.data.client.IDicClient
 import ru.neosvet.dictionary.data.storage.DicStorage
 import ru.neosvet.dictionary.entries.DicStrings
 import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
@@ -19,7 +19,7 @@ object KoinModule {
         val cicerone = Cicerone.create()
         single<NavigatorHolder> { cicerone.getNavigatorHolder() }
         single<Router> { cicerone.router }
-        single<IClient> { Client.create() }
+        single<IDicClient> { DicClient.create() }
         single<IDictionarySource> {
             DictionarySource(
                 client = get(),

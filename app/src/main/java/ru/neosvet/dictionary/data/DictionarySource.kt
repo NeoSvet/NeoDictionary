@@ -1,14 +1,14 @@
 package ru.neosvet.dictionary.data
 
 import io.reactivex.rxjava3.core.Single
-import ru.neosvet.dictionary.data.client.IClient
+import ru.neosvet.dictionary.data.client.IDicClient
 import ru.neosvet.dictionary.entries.Definitions
 import ru.neosvet.dictionary.entries.DicStrings
 import ru.neosvet.dictionary.entries.ResultItem
 import java.util.*
 
 class DictionarySource(
-    private val client: IClient,
+    private val client: IDicClient,
     private val strings: DicStrings
 ) : IDictionarySource {
     override fun searchWord(word: String, language: String): Single<List<ResultItem>> =
