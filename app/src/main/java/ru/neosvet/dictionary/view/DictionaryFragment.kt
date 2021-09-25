@@ -24,6 +24,7 @@ import ru.neosvet.dictionary.entries.WordItem
 import ru.neosvet.dictionary.view.list.MainAdapter
 import ru.neosvet.dictionary.view.list.WordsAdapter
 import ru.neosvet.dictionary.view.screens.HistoryScreen
+import ru.neosvet.dictionary.view.screens.ImageScreen
 import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
 
 class DictionaryFragment : Fragment() {
@@ -99,6 +100,11 @@ class DictionaryFragment : Fragment() {
             val word = it.getParcelable(ARG_WORD) as WordItem?
             word?.let {
                 model.openWord(it)
+            }
+        }
+        binding?.fabImage?.setOnClickListener {
+            model.word?.let {
+                router.navigateTo(ImageScreen.create(it))
             }
         }
     }
@@ -200,6 +206,7 @@ class DictionaryFragment : Fragment() {
         )
         binding?.run {
             tvWelcome.visibility = View.GONE
+            fabImage.visibility = View.VISIBLE
             rvMain.adapter = adapter
         }
         adapter.notifyDataSetChanged()

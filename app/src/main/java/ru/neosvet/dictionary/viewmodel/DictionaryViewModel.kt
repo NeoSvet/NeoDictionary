@@ -3,6 +3,7 @@ package ru.neosvet.dictionary.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.*
 import ru.neosvet.dictionary.Schedulers
 import ru.neosvet.dictionary.data.IDictionarySource
