@@ -3,12 +3,8 @@ package ru.neosvet.dictionary.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import ru.neosvet.dictionary.data.storage.DicStorage
-import ru.neosvet.dictionary.entries.DictionaryState
 import ru.neosvet.dictionary.entries.HistoryState
 import ru.neosvet.dictionary.entries.WordItem
 
@@ -53,5 +49,10 @@ class HistoryViewModel(
                 error = t
             )
         )
+    }
+
+    override fun onCleared() {
+        scope.cancel()
+        super.onCleared()
     }
 }

@@ -6,8 +6,9 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 object DicClient {
+    const val baseUrl = "https://api.dictionaryapi.dev/api/v2/entries/"
     fun create() = Retrofit.Builder()
-        .baseUrl("https://api.dictionaryapi.dev/api/v2/entries/")
+        .baseUrl(baseUrl)
         .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
