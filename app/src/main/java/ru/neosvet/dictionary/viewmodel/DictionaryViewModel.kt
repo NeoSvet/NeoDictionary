@@ -23,12 +23,13 @@ class DictionaryViewModel(
                 + CoroutineExceptionHandler { _, throwable ->
             onError(throwable)
         })
+    private var task: Disposable? = null
 
     override fun searchWord(word: String, language: String) {
         this.word = word.lowercase().also {
             saveWord(it)
 
-            source.searchWord(it, language)
+            task = source.searchWord(it, language)
                 .subscribeOn(Schedulers.background())
                 .observeOn(Schedulers.main())
                 .subscribe(
@@ -128,6 +129,7 @@ class DictionaryViewModel(
     }
 
     override fun onCleared() {
+        task?.dispose()
         scope.cancel()
         super.onCleared()
     }
