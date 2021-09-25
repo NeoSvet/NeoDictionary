@@ -6,14 +6,12 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 object Client {
-    val instance: IClient by lazy {
-        Retrofit.Builder()
-            .baseUrl("https://api.dictionaryapi.dev/api/v2/entries/")
-            .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-            .create(IClient::class.java)
-    }
+    fun create() = Retrofit.Builder()
+        .baseUrl("https://api.dictionaryapi.dev/api/v2/entries/")
+        .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create(gson))
+        .build()
+        .create(IClient::class.java)
 
     private val gson = GsonBuilder()
         .create()
