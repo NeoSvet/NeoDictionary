@@ -14,4 +14,7 @@
     <string name="welcome_message">Добро пожаловать в НеоСловарь! Нажмите на значок лупы в верхнем правом углу, чтобы приступить к поиску слова.</string>
     <string name="not_found">Слово не найдено или на клавиатуре выбран неверный язык</string>
     <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="history">Журнал</string>
+    <string name="history_clear">Журнал пуст</string>
+    <string name="clear">Очистить</string>
 </resources>

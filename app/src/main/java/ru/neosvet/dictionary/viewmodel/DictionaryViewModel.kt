@@ -3,10 +3,8 @@ package ru.neosvet.dictionary.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import io.reactivex.rxjava3.disposables.Disposable
+import kotlinx.coroutines.*
 import ru.neosvet.dictionary.Schedulers
 import ru.neosvet.dictionary.data.IDictionarySource
 import ru.neosvet.dictionary.data.storage.DicStorage
@@ -16,8 +14,8 @@ class DictionaryViewModel(
     private val source: IDictionarySource,
     private val storage: DicStorage
 ) : ViewModel(), IDictionaryViewModel {
-    private val _result: MutableLiveData<ModelResult> = MutableLiveData()
-    override val result: LiveData<ModelResult>
+    private val _result: MutableLiveData<DictionaryState.Model> = MutableLiveData()
+    override val result: LiveData<DictionaryState.Model>
         get() = _result
     override var word: String? = null
         private set
@@ -26,12 +24,13 @@ class DictionaryViewModel(
                 + CoroutineExceptionHandler { _, throwable ->
             onError(throwable)
         })
+    private var task: Disposable? = null
 
     override fun searchWord(word: String, language: String) {
         this.word = word.lowercase().also {
             saveWord(it)
 
-            source.searchWord(it, language)
+            task = source.searchWord(it, language)
                 .subscribeOn(Schedulers.background())
                 .observeOn(Schedulers.main())
                 .subscribe(
@@ -45,16 +44,17 @@ class DictionaryViewModel(
         scope.launch {
             val words = storage.wordDao.getAll("%$constraint%")
             _result.postValue(
-                WordsResult(
+                DictionaryState.Words(
                     words = words
                 )
             )
         }
     }
 
-    override fun openWord(wordId: Int) {
+    override fun openWord(word: WordItem) {
+        this.word = word.word
         scope.launch {
-            val info = storage.infoDao.get(wordId)
+            val info = storage.infoDao.get(word.id)
             val list = mutableListOf<ResultItem>()
             info.forEach {
                 list.add(
@@ -66,7 +66,7 @@ class DictionaryViewModel(
                 )
             }
             _result.postValue(
-                ListResult(
+                DictionaryState.Results(
                     list = list
                 )
             )
@@ -81,15 +81,19 @@ class DictionaryViewModel(
 
     private fun saveWord(word: String) {
         scope.launch {
-            if (storage.wordDao.get(word) == null)
-                storage.wordDao.insert(WordItem(0, word))
+            storage.wordDao.insert(
+                WordItem(
+                    word = word,
+                    time = System.currentTimeMillis()
+                )
+            )
         }
     }
 
     private fun onSuccess(list: List<ResultItem>) {
         saveResult(list)
         _result.postValue(
-            ListResult(
+            DictionaryState.Results(
                 list = list
             )
         )
@@ -119,9 +123,15 @@ class DictionaryViewModel(
     private fun onError(t: Throwable) {
         t.printStackTrace()
         _result.postValue(
-            ErrorResult(
+            DictionaryState.Error(
                 error = t
             )
         )
+    }
+
+    override fun onCleared() {
+        task?.dispose()
+        scope.cancel()
+        super.onCleared()
     }
 }

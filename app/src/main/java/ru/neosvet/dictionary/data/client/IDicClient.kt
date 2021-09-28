@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import ru.neosvet.dictionary.entries.DictionaryResponse
 
-interface IClient {
+interface IDicClient {
     @GET("{language}/{word}")
     fun searchWord(
         @Path("word") word: String,
