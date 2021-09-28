@@ -30,6 +30,8 @@ import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
 class DictionaryFragment : Fragment() {
     companion object {
         private const val ARG_WORD = "word"
+        private const val ERROR_NOT_FOUND = "HTTP 404"
+        private const val LANG_LEN = 2
         fun newInstance(word: WordItem?) =
             DictionaryFragment().apply {
                 word?.let {
@@ -107,16 +109,7 @@ class DictionaryFragment : Fragment() {
                 router.navigateTo(ImageScreen.create(it))
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        model.result.observe(this, resultObserver)
-    }
-
-    override fun onPause() {
-        model.result.removeObserver(resultObserver)
-        super.onPause()
+        model.result.observe(viewLifecycleOwner, resultObserver)
     }
 
     override fun onDestroy() {
@@ -181,8 +174,8 @@ class DictionaryFragment : Fragment() {
                 lang = type.locale
         } else
             lang = type.locale
-        if (lang.length > 2)
-            lang = lang.substring(0, 2)
+        if (lang.length > LANG_LEN)
+            lang = lang.substring(0, LANG_LEN)
         if (lang.isEmpty() || lang == "zz")
             return "en"
         return lang
@@ -220,7 +213,7 @@ class DictionaryFragment : Fragment() {
         var msg = result.error.message
         if (msg == null)
             msg = getString(R.string.unknown_error)
-        else if (msg.contains("HTTP 404"))
+        else if (msg.contains(ERROR_NOT_FOUND))
             msg = getString(R.string.not_found)
         else
             msg = getString(R.string.error) + ": " + msg

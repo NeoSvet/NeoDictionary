@@ -7,9 +7,9 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ImgClient {
-    const val baseUrl = "https://api.flickr.com/services/rest/"
+    const val BASE_URL = "https://api.flickr.com/services/rest/"
     fun create() = Retrofit.Builder()
-        .baseUrl(baseUrl)
+        .baseUrl(BASE_URL)
         .client(
             OkHttpClient.Builder()
                 .addInterceptor(ImgInterceptor)
