@@ -1,13 +1,12 @@
-package ru.neosvet.dictionary.view.list
+package ru.neosvet.neoflickr.view.list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import coil.request.LoadRequest
-import coil.transform.CircleCropTransformation
-import ru.neosvet.dictionary.R
-import ru.neosvet.dictionary.databinding.ItemImageBinding
+import ru.neosvet.neoflickr.R
+import ru.neosvet.neoflickr.databinding.ItemImageBinding
 
 class ImagesAdapter(
     private val urls: List<String>
@@ -50,7 +49,7 @@ class ImagesAdapter(
             )
         )
 
-    override fun onBindViewHolder(holder: ImagesAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.setImage(urls[position], position)
     }
 

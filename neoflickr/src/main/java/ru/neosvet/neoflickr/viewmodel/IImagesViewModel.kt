@@ -1,7 +1,7 @@
-package ru.neosvet.dictionary.viewmodel
+package ru.neosvet.neoflickr.viewmodel
 
 import androidx.lifecycle.LiveData
-import ru.neosvet.dictionary.entries.ImagesState
+import ru.neosvet.neoflickr.entries.ImagesState
 
 interface IImagesViewModel {
     val result: LiveData<ImagesState.Model>

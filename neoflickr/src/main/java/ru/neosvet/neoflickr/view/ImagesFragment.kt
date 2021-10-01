@@ -1,4 +1,4 @@
-package ru.neosvet.dictionary.view
+package ru.neosvet.neoflickr.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,13 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
-import org.koin.android.ext.android.inject
-import ru.neosvet.dictionary.R
-import ru.neosvet.dictionary.databinding.FragmentImagesBinding
-import ru.neosvet.dictionary.entries.ImagesState
-import ru.neosvet.dictionary.view.list.ImagesAdapter
-import ru.neosvet.dictionary.viewmodel.ImagesViewModel
+import ru.neosvet.neoflickr.R
+import ru.neosvet.neoflickr.databinding.FragmentImagesBinding
+import ru.neosvet.neoflickr.entries.ImagesState
+import ru.neosvet.neoflickr.view.list.ImagesAdapter
+import ru.neosvet.neoflickr.viewmodel.ImagesViewModel
 
 class ImagesFragment : Fragment() {
     companion object {
@@ -27,13 +27,16 @@ class ImagesFragment : Fragment() {
 
     private var binding: FragmentImagesBinding? = null
     private var errorBar: Snackbar? = null
-    private val model: ImagesViewModel by inject()
-    private val resultObserver = Observer<ImagesState.Model> { result ->
-        when (result.state) {
-            ImagesState.State.IMAGES -> onImages(result as ImagesState.Images)
-            ImagesState.State.ERROR -> onError(result as ImagesState.Error)
-        }
+    private val model: ImagesViewModel by lazy {
+        ViewModelProvider.NewInstanceFactory().create(ImagesViewModel::class.java)
     }
+    private val resultObserver =
+        Observer<ImagesState.Model> { result ->
+            when (result.state) {
+                ImagesState.State.IMAGES -> onImages(result as ImagesState.Images)
+                ImagesState.State.ERROR -> onError(result as ImagesState.Error)
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,

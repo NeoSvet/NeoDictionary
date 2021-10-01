@@ -1,4 +1,4 @@
-package ru.neosvet.dictionary.data
+package ru.neosvet.neoflickr.data
 
 import io.reactivex.rxjava3.core.Single
 
