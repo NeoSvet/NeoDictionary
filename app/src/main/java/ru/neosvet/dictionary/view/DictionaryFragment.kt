@@ -15,7 +15,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.github.terrakok.cicerone.Router
 import com.google.android.material.snackbar.Snackbar
-import org.koin.android.ext.android.inject
+import org.koin.android.ext.android.getKoin
+import org.koin.core.scope.Scope
 import ru.neosvet.dictionary.R
 import ru.neosvet.dictionary.databinding.FragmentDictionaryBinding
 import ru.neosvet.dictionary.entries.DictionaryState
@@ -43,8 +44,9 @@ class DictionaryFragment : Fragment() {
     }
 
     private var binding: FragmentDictionaryBinding? = null
-    private val router: Router by inject()
-    private val model: DictionaryViewModel by inject()
+    private val scope: Scope = getKoin().createScope<DictionaryFragment>()
+    private val router: Router by scope.inject()
+    private val model: DictionaryViewModel by scope.inject()
     private val imm: InputMethodManager by lazy {
         requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
@@ -223,5 +225,10 @@ class DictionaryFragment : Fragment() {
             )
             errorBar?.show()
         }
+    }
+
+    override fun onDestroyView() {
+        scope.close()
+        super.onDestroyView()
     }
 }

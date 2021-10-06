@@ -8,6 +8,8 @@ import androidx.lifecycle.Observer
 import com.github.terrakok.cicerone.Router
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
+import org.koin.android.ext.android.getKoin
+import org.koin.core.scope.Scope
 import ru.neosvet.dictionary.R
 import ru.neosvet.dictionary.databinding.FragmentHistoryBinding
 import ru.neosvet.dictionary.entries.HistoryState
@@ -19,8 +21,9 @@ import ru.neosvet.dictionary.viewmodel.HistoryViewModel
 
 class HistoryFragment : Fragment() {
     private var binding: FragmentHistoryBinding? = null
+    private val scope: Scope = getKoin().createScope<HistoryFragment>()
     private val router: Router by inject()
-    private val model: HistoryViewModel by inject()
+    private val model: HistoryViewModel by scope.inject()
     private val resultObserver = Observer<HistoryState.Model> { result ->
         when (result.state) {
             HistoryState.State.WORDS -> onWords(result as HistoryState.Words)
@@ -110,5 +113,10 @@ class HistoryFragment : Fragment() {
             )
             errorBar?.show()
         }
+    }
+
+    override fun onDestroyView() {
+        scope.close()
+        super.onDestroyView()
     }
 }

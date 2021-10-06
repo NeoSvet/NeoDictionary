@@ -4,6 +4,7 @@ import com.github.terrakok.cicerone.Cicerone
 import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.Router
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import ru.neosvet.dictionary.data.DictionarySource
 import ru.neosvet.dictionary.data.IDictionarySource
@@ -11,6 +12,8 @@ import ru.neosvet.dictionary.data.client.DicClient
 import ru.neosvet.dictionary.data.client.IDicClient
 import ru.neosvet.dictionary.data.storage.DicStorage
 import ru.neosvet.dictionary.entries.DicStrings
+import ru.neosvet.dictionary.view.DictionaryFragment
+import ru.neosvet.dictionary.view.HistoryFragment
 import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
 import ru.neosvet.dictionary.viewmodel.HistoryViewModel
 
@@ -19,23 +22,29 @@ object KoinModule {
         val cicerone = Cicerone.create()
         single<NavigatorHolder> { cicerone.getNavigatorHolder() }
         single<Router> { cicerone.router }
-        single<IDicClient> { DicClient.create() }
-        single<IDictionarySource> {
-            DictionarySource(
-                client = get(),
-                strings = strings
-            )
+
+        scope(named<DictionaryFragment>()) {
+            scoped<IDicClient> { DicClient.create() }
+            scoped<IDictionarySource> {
+                DictionarySource(
+                    client = get(),
+                    strings = strings
+                )
+            }
+            viewModel {
+                DictionaryViewModel(
+                    source = get(),
+                    storage = storage
+                )
+            }
         }
-        viewModel {
-            DictionaryViewModel(
-                source = get(),
-                storage = storage
-            )
-        }
-        viewModel {
-            HistoryViewModel(
-                storage = storage
-            )
+
+        scope(named<HistoryFragment>()) {
+            viewModel {
+                HistoryViewModel(
+                    storage = storage
+                )
+            }
         }
     }
 }
