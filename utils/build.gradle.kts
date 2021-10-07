@@ -32,4 +32,6 @@ android {
 dependencies {
     implementation(Basic.core_ktx)
     implementation(Basic.appcompat)
+    implementation(Coroutines.core)
+    implementation(Coroutines.c_android)
 }

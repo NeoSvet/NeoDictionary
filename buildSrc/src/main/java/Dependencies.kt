@@ -5,6 +5,9 @@ object Versions {
     const val material = "1.4.0"
     const val constraint = "2.1.0"
 
+    //Coroutines
+    const val coroutines = "1.5.2"
+
     //rxJava
     const val rx_java = "3.0.6"
     const val rx_android = "3.0.0"
@@ -30,6 +33,11 @@ object Basic {
     const val appcompat = "androidx.appcompat:appcompat:${Versions.appcompat}"
     const val material = "com.google.android.material:material:${Versions.material}"
     const val constraint = "androidx.constraintlayout:constraintlayout:${Versions.constraint}"
+}
+
+object Coroutines {
+    const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
+    const val c_android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
 }
 
 object RxJava {
