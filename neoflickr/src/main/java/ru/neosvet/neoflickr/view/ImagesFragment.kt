@@ -34,10 +34,11 @@ class ImagesFragment : Fragment() {
         ViewModelProvider.NewInstanceFactory().create(ImagesViewModel::class.java)
     }
     private val resultObserver =
-        Observer<ImagesState.Model> { result ->
-            when (result.state) {
-                ImagesState.State.IMAGES -> onImages(result as ImagesState.Images)
-                ImagesState.State.ERROR -> onError(result as ImagesState.Error)
+        Observer<ImagesState.Model> { response ->
+            when (response) {
+                is ImagesState.Start -> errorBar?.dismiss()
+                is ImagesState.Images -> onImages(response)
+                is ImagesState.Error -> onError(response)
             }
         }
 

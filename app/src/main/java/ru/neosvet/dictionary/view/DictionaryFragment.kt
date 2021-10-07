@@ -73,11 +73,12 @@ class DictionaryFragment : Fragment() {
             }
         }
     }
-    private val resultObserver = Observer<DictionaryState.Model> { result ->
-        when (result.state) {
-            DictionaryState.State.RESULTS -> onResults(result as DictionaryState.Results)
-            DictionaryState.State.WORDS -> onWords(result as DictionaryState.Words)
-            DictionaryState.State.ERROR -> onError(result as DictionaryState.Error)
+    private val resultObserver = Observer<DictionaryState.Model> { response ->
+        when (response) {
+            is DictionaryState.Start -> errorBar?.dismiss()
+            is DictionaryState.Results -> onResults(response)
+            is DictionaryState.Words -> onWords(response)
+            is DictionaryState.Error -> onError(response)
         }
     }
     private lateinit var adWords: WordsAdapter

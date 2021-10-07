@@ -25,10 +25,10 @@ class HistoryFragment : Fragment() {
     private val scope: Scope = getKoin().createScope<HistoryFragment>()
     private val router: Router by inject()
     private val model: HistoryViewModel by scope.inject()
-    private val resultObserver = Observer<HistoryState.Model> { result ->
-        when (result.state) {
-            HistoryState.State.WORDS -> onWords(result as HistoryState.Words)
-            HistoryState.State.ERROR -> onError(result as HistoryState.Error)
+    private val resultObserver = Observer<HistoryState.Model> { response ->
+        when (response) {
+            is HistoryState.Words -> onWords(response)
+            is HistoryState.Error -> onError(response)
         }
     }
     private var errorBar: Snackbar? = null
