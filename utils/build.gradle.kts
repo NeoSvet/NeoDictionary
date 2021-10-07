@@ -30,14 +30,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":utils"))
     implementation(Basic.core_ktx)
     implementation(Basic.appcompat)
-    implementation(Basic.material)
-    implementation(RxJava.rxjava)
-    implementation(RxJava.rxandroid)
-    implementation(Retrofit.core)
-    implementation(Retrofit.converter_gson)
-    implementation(Retrofit.adapter_rxjava)
-    implementation(Coil.core)
 }

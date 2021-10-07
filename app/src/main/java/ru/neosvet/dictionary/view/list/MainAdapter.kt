@@ -6,9 +6,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ru.neosvet.dictionary.R
-import ru.neosvet.dictionary.databinding.ItemLabelBinding
-import ru.neosvet.dictionary.databinding.ItemTitleBinding
 import ru.neosvet.dictionary.entries.ResultItem
+import ru.neosvet.utils.viewById
 
 class MainAdapter(
     private val onItemClickListener: ((ResultItem) -> Unit),
@@ -17,9 +16,10 @@ class MainAdapter(
     private val TYPE_TITLE = 0
     private val TYPE_LABEL = 1
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolder(root: View) : RecyclerView.ViewHolder(root) {
+        private val tv by root.viewById<TextView>(R.id.tv_item)
+
         fun setItem(item: ResultItem) {
-            val tv = itemView.findViewById(R.id.tv_item) as TextView
             if (item.title != null)
                 tv.text = item.title
             else
@@ -40,19 +40,11 @@ class MainAdapter(
         when (viewType) {
             TYPE_TITLE ->
                 ViewHolder(
-                    ItemTitleBinding.inflate(
-                        LayoutInflater.from(parent.context),
-                        parent,
-                        false
-                    ).root
+                    LayoutInflater.from(parent.context).inflate(R.layout.item_title, parent, false)
                 )
             else -> //TYPE_LABEL
                 ViewHolder(
-                    ItemLabelBinding.inflate(
-                        LayoutInflater.from(parent.context),
-                        parent,
-                        false
-                    ).root
+                    LayoutInflater.from(parent.context).inflate(R.layout.item_label, parent, false)
                 )
         }
 

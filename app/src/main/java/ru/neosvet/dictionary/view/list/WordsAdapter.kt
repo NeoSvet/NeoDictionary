@@ -4,13 +4,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Filter
-import android.widget.Filterable
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import ru.neosvet.dictionary.R
-import ru.neosvet.dictionary.databinding.ItemWordBinding
 import ru.neosvet.dictionary.entries.WordItem
+import ru.neosvet.utils.viewById
 
 class WordsAdapter(
     context: Context,
@@ -23,8 +21,11 @@ class WordsAdapter(
         OPEN, DELETE
     }
 
-    inner class ViewHolder(private val vb: ItemWordBinding) : RecyclerView.ViewHolder(vb.root) {
-        fun setItem(item: WordItem) = with(vb) {
+    inner class ViewHolder(root: View) : RecyclerView.ViewHolder(root) {
+        private val tvWord by root.viewById<TextView>(R.id.tv_word)
+        private val ivDelete by root.viewById<ImageView>(R.id.iv_delete)
+
+        fun setItem(item: WordItem) {
             tvWord.text = item.word
             tvWord.setOnClickListener {
                 onItemClickListener.invoke(item, Event.OPEN)
@@ -36,11 +37,7 @@ class WordsAdapter(
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup) = ViewHolder(
-        ItemWordBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
+        LayoutInflater.from(parent.context).inflate(R.layout.item_word, parent, false)
     ).apply {
         setItem(words[position])
     }.itemView

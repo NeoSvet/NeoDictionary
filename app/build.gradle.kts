@@ -32,13 +32,11 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    viewBinding {
-       android.buildFeatures.viewBinding = true
-    }
 }
 
 dependencies {
     implementation(project(":neoflickr"))
+    implementation(project(":utils"))
     implementation(Basic.core_ktx)
     implementation(Basic.appcompat)
     implementation(Basic.material)

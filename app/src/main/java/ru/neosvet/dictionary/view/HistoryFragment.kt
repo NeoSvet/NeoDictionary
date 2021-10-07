@@ -2,25 +2,26 @@ package ru.neosvet.dictionary.view
 
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
 import com.github.terrakok.cicerone.Router
 import com.google.android.material.snackbar.Snackbar
-import org.koin.android.ext.android.inject
 import org.koin.android.ext.android.getKoin
+import org.koin.android.ext.android.inject
 import org.koin.core.scope.Scope
 import ru.neosvet.dictionary.R
-import ru.neosvet.dictionary.databinding.FragmentHistoryBinding
 import ru.neosvet.dictionary.entries.HistoryState
 import ru.neosvet.dictionary.entries.WordItem
 import ru.neosvet.dictionary.utils.TimeFormatter
 import ru.neosvet.dictionary.view.list.HistoryAdapter
 import ru.neosvet.dictionary.view.screens.DictionaryScreen
 import ru.neosvet.dictionary.viewmodel.HistoryViewModel
+import ru.neosvet.utils.viewById
 
 class HistoryFragment : Fragment() {
-    private var binding: FragmentHistoryBinding? = null
     private val scope: Scope = getKoin().createScope<HistoryFragment>()
     private val router: Router by inject()
     private val model: HistoryViewModel by scope.inject()
@@ -41,13 +42,14 @@ class HistoryFragment : Fragment() {
             }
         }
     }
+    private val rvHistory by viewById<RecyclerView>(R.id.rv_history)
+    private val tvHistoryClear by viewById<TextView>(R.id.tv_history_clear)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = FragmentHistoryBinding.inflate(inflater, container, false).let {
-        binding = it
-        it.root
+    ): View? {
+        return inflater.inflate(R.layout.fragment_history, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,11 +68,6 @@ class HistoryFragment : Fragment() {
         super.onPause()
     }
 
-    override fun onDestroy() {
-        binding = null
-        super.onDestroy()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         val item = menu.add(R.string.clear)
         item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear)
@@ -79,7 +76,7 @@ class HistoryFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         model.clearHistory()
-        binding?.tvHistoryClear?.visibility = View.VISIBLE
+        tvHistoryClear.visibility = View.VISIBLE
         return super.onOptionsItemSelected(item)
     }
 
@@ -92,7 +89,7 @@ class HistoryFragment : Fragment() {
         adapter.removeWord(item)
     }
 
-    private fun onWords(result: HistoryState.Words) = binding?.run {
+    private fun onWords(result: HistoryState.Words) {
         tvHistoryClear.visibility = View.GONE
         adapter.setWords(result.words)
         rvHistory.adapter = adapter
@@ -107,12 +104,10 @@ class HistoryFragment : Fragment() {
             msg = getString(R.string.not_found)
         else
             msg = getString(R.string.error) + ": " + msg
-        binding?.run {
-            errorBar = Snackbar.make(
-                rvHistory, msg, Snackbar.LENGTH_INDEFINITE
-            )
-            errorBar?.show()
-        }
+        errorBar = Snackbar.make(
+            rvHistory, msg, Snackbar.LENGTH_INDEFINITE
+        )
+        errorBar?.show()
     }
 
     override fun onDestroyView() {
