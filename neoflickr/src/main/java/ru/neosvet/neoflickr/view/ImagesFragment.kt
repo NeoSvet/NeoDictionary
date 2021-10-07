@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import geekbrains.ru.utils.network.OnlineObserver
 import ru.neosvet.neoflickr.R
 import ru.neosvet.neoflickr.entries.ImagesState
 import ru.neosvet.neoflickr.view.list.ImagesAdapter
@@ -33,6 +34,9 @@ class ImagesFragment : Fragment() {
     private val model: ImagesViewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(ImagesViewModel::class.java)
     }
+    private val onlineObserver: OnlineObserver by lazy {
+        OnlineObserver(requireContext())
+    }
     private val resultObserver =
         Observer<ImagesState.Model> { response ->
             when (response) {
@@ -54,7 +58,7 @@ class ImagesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         arguments?.let {
             it.getString(ARG_QUERY)?.let {
-                model.search(it)
+                model.search(it, onlineObserver)
             }
         }
     }
