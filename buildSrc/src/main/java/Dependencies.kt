@@ -4,6 +4,7 @@ object Versions {
     const val appcompat = "1.3.1"
     const val material = "1.4.0"
     const val constraint = "2.1.0"
+    const val splashscreen = "1.0.0-alpha02"
 
     //Coroutines
     const val coroutines = "1.5.2"
@@ -33,6 +34,7 @@ object Basic {
     const val appcompat = "androidx.appcompat:appcompat:${Versions.appcompat}"
     const val material = "com.google.android.material:material:${Versions.material}"
     const val constraint = "androidx.constraintlayout:constraintlayout:${Versions.constraint}"
+    const val splashscreen = "androidx.core:core-splashscreen:${Versions.splashscreen}"
 }
 
 object Coroutines {

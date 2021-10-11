@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    compileSdk = 30
+    compileSdk = 31
 
     defaultConfig {
         applicationId = "ru.neosvet.dictionary"
         minSdk = 23
-        targetSdk = 30
+        targetSdk = 31
         versionCode = 1
         versionName = "1.0"
     }
@@ -41,6 +41,7 @@ dependencies {
     implementation(Basic.appcompat)
     implementation(Basic.material)
     implementation(Basic.constraint)
+    implementation(Basic.splashscreen)
     implementation(RxJava.rxjava)
     implementation(RxJava.rxandroid)
     implementation(Retrofit.core)
