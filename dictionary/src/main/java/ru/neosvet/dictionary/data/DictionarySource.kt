@@ -19,9 +19,8 @@ class DictionarySource(
                 list.add(ResultItem(strings.word + ": " + response.word, null, null))
 
                 if (response.phonetics[0].text != null) {
-                    list.add(ResultItem(strings.phonetics, null, null))
                     response.phonetics.forEach {
-                        list.add(ResultItem(null, it.text, it.audio))
+                        list.add(ResultItem(null, strings.phonetics + ": " + it.text, it.audio))
                     }
                 }
 
