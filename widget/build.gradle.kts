@@ -1,17 +1,14 @@
 plugins {
-    id("com.android.application")
+    id("com.android.library")
     kotlin("android")
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 30
 
     defaultConfig {
-        applicationId = "ru.neosvet.dictionary"
         minSdk = 23
-        targetSdk = 31
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 30
     }
 
     buildTypes {
@@ -33,22 +30,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":widget"))
     implementation(project(":dictionary"))
-    implementation(project(":neoflickr"))
-    implementation(project(":utils"))
     implementation(Basic.core_ktx)
     implementation(Basic.appcompat)
-    implementation(Basic.material)
-    implementation(Basic.constraint)
-    implementation(Basic.splashscreen)
-    implementation(RxJava.rxandroid)
-    implementation(Room.runtime)
-    implementation(Room.room_ktx)
-    implementation(Koin.core)
-    implementation(Koin.koin_android)
-    implementation(Koin.compat)
     implementation(Coroutines.core)
     implementation(Coroutines.c_android)
-    implementation(Cicerone.core)
+    implementation(Room.runtime)
 }
