@@ -1,17 +1,16 @@
 plugins {
-    id("com.android.application")
+    id("com.android.library")
     kotlin("android")
+    kotlin("kapt")
+    id("kotlin-parcelize")
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 30
 
     defaultConfig {
-        applicationId = "ru.neosvet.dictionary"
         minSdk = 23
-        targetSdk = 31
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 30
     }
 
     buildTypes {
@@ -33,20 +32,18 @@ android {
 }
 
 dependencies {
-    implementation(project(":dictionary"))
-    implementation(project(":neoflickr"))
     implementation(project(":utils"))
     implementation(Basic.core_ktx)
-    implementation(Basic.appcompat)
-    implementation(Basic.material)
-    implementation(Basic.constraint)
-    implementation(Basic.splashscreen)
-    implementation(Room.runtime)
-    implementation(Room.room_ktx)
-    implementation(Koin.core)
-    implementation(Koin.koin_android)
-    implementation(Koin.compat)
+    implementation(RxJava.rxjava)
+    implementation(RxJava.rxandroid)
+    implementation(Retrofit.core)
+    implementation(Retrofit.converter_gson)
+    implementation(Retrofit.adapter_rxjava)
     implementation(Coroutines.core)
     implementation(Coroutines.c_android)
-    implementation(Cicerone.core)
+    implementation(Room.runtime)
+    implementation(Room.room_ktx)
+    implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:2.3.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
+    kapt(Room.kapt_compiler)
 }
