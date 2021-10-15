@@ -5,12 +5,14 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.RemoteViews
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.neosvet.dictionary.data.storage.DicStorage
+import ru.neosvet.dictionary.entries.InfoItem
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -37,9 +39,9 @@ class DicWidget : AppWidgetProvider() {
                 context.packageName,
                 R.layout.widget
             ).apply {
-                val adapter = Intent(context, ListService::class.java)
-                adapter.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
-                setRemoteAdapter(R.id.lv_info, adapter)
+                val intent = Intent(context, ListService::class.java)
+                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
+                setRemoteAdapter(R.id.lv_info, intent)
 
                 setOnClickPendingIntent(R.id.btn_prev, getPendingIntent(context, id, ACTION_MINUS))
                 setOnClickPendingIntent(R.id.btn_next, getPendingIntent(context, id, ACTION_PLUS))
@@ -54,7 +56,12 @@ class DicWidget : AppWidgetProvider() {
         val intent = Intent(context, DicWidget::class.java)
         intent.action = action
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-        return PendingIntent.getBroadcast(context, widgetId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        return PendingIntent.getBroadcast(
+            context,
+            widgetId,
+            intent,
+            PendingIntent.FLAG_CANCEL_CURRENT
+        )
     }
 
     override fun onAppWidgetOptionsChanged(
@@ -90,47 +97,58 @@ class DicWidget : AppWidgetProvider() {
         if (id == AppWidgetManager.INVALID_APPWIDGET_ID)
             return
 
-        val storage = DicStorage.get(context)
         scope.launch {
+            val storage = DicStorage.get(context)
             val words = storage.wordDao.getAll()
             if (words.isEmpty())
                 return@launch
 
-            val pref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-            var i = pref.getInt(INDEX, -1) +
-                    if (intent.action == ACTION_MINUS) -1 else 1
-            if (i >= words.size)
-                i = 0
-            else if (i < 0)
-                i = words.size - 1
+            val index = getIndex(
+                pref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE),
+                step = if (intent.action == ACTION_MINUS) -1 else 1,
+                limit = words.size
+            )
 
-            val info = storage.infoDao.get(words[i].id)
-            try {
-                val f = File(context.filesDir.toString() + FILE_NAME)
-                if (info.isEmpty()) {
-                    f.delete()
-                } else {
-                    val bw = BufferedWriter(FileWriter(f))
-                    info[0].title?.let {
+            saveInfoToFile(
+                info = storage.infoDao.get(words[index].id),
+                file = File(context.filesDir.toString() + FILE_NAME)
+            )
+
+            onUpdate(context, AppWidgetManager.getInstance(context), intArrayOf(id))
+        }
+    }
+
+    private fun getIndex(pref: SharedPreferences, step: Int, limit: Int): Int {
+        var i = pref.getInt(INDEX, -1) + step
+        if (i >= limit)
+            i = 0
+        else if (i < 0)
+            i = limit - 1
+        val edit = pref.edit()
+        edit.putInt(INDEX, i)
+        edit.apply()
+        return i
+    }
+
+    private fun saveInfoToFile(info: List<InfoItem>, file: File) {
+        try {
+            if (info.isEmpty()) {
+                file.delete()
+            } else {
+                val bw = BufferedWriter(FileWriter(file))
+                info[0].title?.let {
+                    bw.write(it)
+                    bw.newLine()
+                }
+                info.forEach { item ->
+                    item.description?.let {
                         bw.write(it)
                         bw.newLine()
                     }
-                    info.forEach { item ->
-                        item.description?.let {
-                            bw.write(it)
-                            bw.newLine()
-                        }
-                    }
-                    bw.close()
                 }
-            } catch (e: Exception) {
+                bw.close()
             }
-
-            val edit = pref.edit()
-            edit.putInt(INDEX, i)
-            edit.apply()
-
-            onUpdate(context, AppWidgetManager.getInstance(context), intArrayOf(id))
+        } catch (e: Exception) {
         }
     }
 }
