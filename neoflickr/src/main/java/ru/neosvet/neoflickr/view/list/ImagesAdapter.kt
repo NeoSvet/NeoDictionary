@@ -1,11 +1,15 @@
 package ru.neosvet.neoflickr.view.list
 
+import android.graphics.RenderEffect
+import android.graphics.Shader
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
+import coil.api.clear
 import coil.request.LoadRequest
 import ru.neosvet.neoflickr.R
 import ru.neosvet.utils.viewById
@@ -38,6 +42,17 @@ class ImagesAdapter(
                 .build()
 
             ImageLoader(context).execute(request)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                ivImage.setOnClickListener {
+                    ivImage.setRenderEffect(
+                        RenderEffect.createBlurEffect(
+                            15f,
+                            15f,
+                            Shader.TileMode.REPEAT
+                        )
+                    )
+                }
         }
     }
 
