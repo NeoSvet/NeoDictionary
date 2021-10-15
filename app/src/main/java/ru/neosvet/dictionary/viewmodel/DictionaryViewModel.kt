@@ -3,14 +3,17 @@ package ru.neosvet.dictionary.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import geekbrains.ru.utils.network.OnlineObserver
 import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import ru.neosvet.dictionary.Schedulers
 import ru.neosvet.dictionary.data.IDictionarySource
 import ru.neosvet.dictionary.data.storage.DicStorage
 import ru.neosvet.dictionary.entries.*
 
 class DictionaryViewModel(
+    private val observer: OnlineObserver,
     private val source: IDictionarySource,
     private val storage: DicStorage
 ) : ViewModel(), IDictionaryViewModel {
@@ -25,19 +28,38 @@ class DictionaryViewModel(
             onError(throwable)
         })
     private var task: Disposable? = null
+    private var connector: Job? = null
 
     override fun searchWord(word: String, language: String) {
-        this.word = word.lowercase().also {
-            saveWord(it)
+        this.word = word.lowercase().also { word ->
+            saveWord(word)
 
-            task = source.searchWord(it, language)
-                .subscribeOn(Schedulers.background())
-                .observeOn(Schedulers.main())
-                .subscribe(
-                    this::onSuccess,
-                    this::onError
-                )
+            if (observer.isOnline.value) {
+                startSearch(word, language)
+            } else {
+                connector = scope.launch {
+                    observer.isOnline.collect {
+                        if (it)
+                            startSearch(word, language)
+                        else
+                            onError(observer.exception)
+                    }
+                }
+            }
         }
+    }
+
+    private fun startSearch(word: String, language: String) {
+        _result.postValue(
+            DictionaryState.Start
+        )
+        task = source.searchWord(word, language)
+            .subscribeOn(Schedulers.background())
+            .observeOn(Schedulers.main())
+            .subscribe(
+                this::onSuccess,
+                this::onError
+            )
     }
 
     override fun getWords(constraint: String) {
@@ -91,6 +113,7 @@ class DictionaryViewModel(
     }
 
     private fun onSuccess(list: List<ResultItem>) {
+        connector?.cancel()
         saveResult(list)
         _result.postValue(
             DictionaryState.Results(

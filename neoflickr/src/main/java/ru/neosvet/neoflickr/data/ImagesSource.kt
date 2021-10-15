@@ -1,15 +1,15 @@
-package ru.neosvet.dictionary.data
+package ru.neosvet.neoflickr.data
 
 import io.reactivex.rxjava3.core.Single
-import ru.neosvet.dictionary.data.client.IImgClient
-import ru.neosvet.dictionary.entries.Photo
+import ru.neosvet.neoflickr.data.client.IImgClient
+import ru.neosvet.neoflickr.entries.Photo
 
 class ImagesSource(
     private val client: IImgClient
 ) : IImagesSource {
     override fun search(query: String): Single<List<String>> =
         client.searchImages(query)
-            .flatMap{
+            .flatMap {
                 if (it.stat == "fail")
                     Single.error(Exception(it.message))
                 else {

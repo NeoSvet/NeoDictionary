@@ -1,4 +1,4 @@
-package ru.neosvet.dictionary.data.client
+package ru.neosvet.neoflickr.data.client
 
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient

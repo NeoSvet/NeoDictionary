@@ -1,4 +1,4 @@
-package ru.neosvet.dictionary.entries
+package ru.neosvet.neoflickr.entries
 
 import com.google.gson.annotations.SerializedName
 

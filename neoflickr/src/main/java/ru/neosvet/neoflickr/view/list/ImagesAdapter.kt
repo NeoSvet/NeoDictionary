@@ -1,24 +1,28 @@
-package ru.neosvet.dictionary.view.list
+package ru.neosvet.neoflickr.view.list
 
+import android.graphics.RenderEffect
+import android.graphics.Shader
+import android.os.Build
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
+import coil.api.clear
 import coil.request.LoadRequest
-import coil.transform.CircleCropTransformation
-import ru.neosvet.dictionary.R
-import ru.neosvet.dictionary.databinding.ItemImageBinding
+import ru.neosvet.neoflickr.R
+import ru.neosvet.utils.viewById
 
 class ImagesAdapter(
     private val urls: List<String>
 ) : RecyclerView.Adapter<ImagesAdapter.ViewHolder>() {
 
-    inner class ViewHolder(
-        private val binding: ItemImageBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(root: View) : RecyclerView.ViewHolder(root) {
+        private val ivImage by root.viewById<ImageView>(R.id.iv_image)
         var pos: Int = -1
 
-        fun setImage(url: String, position: Int) = with(binding) {
+        fun setImage(url: String, position: Int) {
             pos = position
             val context = ivImage.context
 
@@ -38,19 +42,26 @@ class ImagesAdapter(
                 .build()
 
             ImageLoader(context).execute(request)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                ivImage.setOnClickListener {
+                    ivImage.setRenderEffect(
+                        RenderEffect.createBlurEffect(
+                            15f,
+                            15f,
+                            Shader.TileMode.REPEAT
+                        )
+                    )
+                }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(
-            ItemImageBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
+            LayoutInflater.from(parent.context).inflate(R.layout.item_image, parent, false)
         )
 
-    override fun onBindViewHolder(holder: ImagesAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.setImage(urls[position], position)
     }
 

@@ -1,4 +1,4 @@
-package ru.neosvet.dictionary.data.client
+package ru.neosvet.neoflickr.data.client
 
 import okhttp3.Interceptor
 import okhttp3.Response

@@ -9,15 +9,18 @@ import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.Filter
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
 import com.github.terrakok.cicerone.Router
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import org.koin.android.ext.android.inject
+import org.koin.android.ext.android.getKoin
+import org.koin.core.scope.Scope
 import ru.neosvet.dictionary.R
-import ru.neosvet.dictionary.databinding.FragmentDictionaryBinding
 import ru.neosvet.dictionary.entries.DictionaryState
 import ru.neosvet.dictionary.entries.ResultItem
 import ru.neosvet.dictionary.entries.WordItem
@@ -26,6 +29,7 @@ import ru.neosvet.dictionary.view.list.WordsAdapter
 import ru.neosvet.dictionary.view.screens.HistoryScreen
 import ru.neosvet.dictionary.view.screens.ImageScreen
 import ru.neosvet.dictionary.viewmodel.DictionaryViewModel
+import ru.neosvet.utils.viewById
 
 class DictionaryFragment : Fragment() {
     companion object {
@@ -42,9 +46,12 @@ class DictionaryFragment : Fragment() {
             }
     }
 
-    private var binding: FragmentDictionaryBinding? = null
-    private val router: Router by inject()
-    private val model: DictionaryViewModel by inject()
+    private val scope: Scope = getKoin().createScope<DictionaryFragment>()
+    private val router: Router by scope.inject()
+    private val model: DictionaryViewModel by scope.inject()
+    private val rvMain by viewById<RecyclerView>(R.id.rv_main)
+    private val fabImage by viewById<FloatingActionButton>(R.id.fab_image)
+    private val tvWelcome by viewById<TextView>(R.id.tv_welcome)
     private val imm: InputMethodManager by lazy {
         requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
@@ -66,11 +73,12 @@ class DictionaryFragment : Fragment() {
             }
         }
     }
-    private val resultObserver = Observer<DictionaryState.Model> { result ->
-        when (result.state) {
-            DictionaryState.State.RESULTS -> onResults(result as DictionaryState.Results)
-            DictionaryState.State.WORDS -> onWords(result as DictionaryState.Words)
-            DictionaryState.State.ERROR -> onError(result as DictionaryState.Error)
+    private val resultObserver = Observer<DictionaryState.Model> { response ->
+        when (response) {
+            is DictionaryState.Start -> errorBar?.dismiss()
+            is DictionaryState.Results -> onResults(response)
+            is DictionaryState.Words -> onWords(response)
+            is DictionaryState.Error -> onError(response)
         }
     }
     private lateinit var adWords: WordsAdapter
@@ -90,9 +98,8 @@ class DictionaryFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = FragmentDictionaryBinding.inflate(inflater, container, false).let {
-        binding = it
-        it.root
+    ): View? {
+        return inflater.inflate(R.layout.fragment_dictionary, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -104,17 +111,12 @@ class DictionaryFragment : Fragment() {
                 model.openWord(it)
             }
         }
-        binding?.fabImage?.setOnClickListener {
+        fabImage.setOnClickListener {
             model.word?.let {
                 router.navigateTo(ImageScreen.create(it))
             }
         }
         model.result.observe(viewLifecycleOwner, resultObserver)
-    }
-
-    override fun onDestroy() {
-        binding = null
-        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -197,11 +199,9 @@ class DictionaryFragment : Fragment() {
             onItemClickListener = onItemClickListener,
             data = result.list
         )
-        binding?.run {
-            tvWelcome.visibility = View.GONE
-            fabImage.visibility = View.VISIBLE
-            rvMain.adapter = adapter
-        }
+        tvWelcome.visibility = View.GONE
+        fabImage.visibility = View.VISIBLE
+        rvMain.adapter = adapter
         adapter.notifyDataSetChanged()
     }
 
@@ -217,11 +217,14 @@ class DictionaryFragment : Fragment() {
             msg = getString(R.string.not_found)
         else
             msg = getString(R.string.error) + ": " + msg
-        binding?.run {
-            errorBar = Snackbar.make(
-                rvMain, msg, Snackbar.LENGTH_INDEFINITE
-            )
-            errorBar?.show()
-        }
+        errorBar = Snackbar.make(
+            rvMain, msg, Snackbar.LENGTH_INDEFINITE
+        )
+        errorBar?.show()
+    }
+
+    override fun onDestroyView() {
+        scope.close()
+        super.onDestroyView()
     }
 }

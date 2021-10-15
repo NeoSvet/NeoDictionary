@@ -3,10 +3,13 @@ package ru.neosvet.dictionary.view.list
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import ru.neosvet.dictionary.databinding.ItemHistoryBinding
+import ru.neosvet.dictionary.R
 import ru.neosvet.dictionary.entries.WordItem
 import ru.neosvet.dictionary.utils.ITimeFormatter
+import ru.neosvet.utils.viewById
 
 class HistoryAdapter(
     private val timeFormatter: ITimeFormatter,
@@ -19,21 +22,23 @@ class HistoryAdapter(
     }
 
     inner class ViewHolder(
-        private val binding: ItemHistoryBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+        private val root: View
+    ) : RecyclerView.ViewHolder(root) {
+        private val tvWord by root.viewById<TextView>(R.id.tv_word)
+        private val tvTime by root.viewById<TextView>(R.id.tv_time)
+        private val ivDelete by root.viewById<ImageView>(R.id.iv_delete)
+
         fun setItem(item: WordItem) {
-            binding.run {
-                tvWord.text = item.word
-                if (item.time == 0L)
-                    tvTime.visibility = View.GONE
-                else
-                    tvTime.text = timeFormatter.format(item.time)
-                root.setOnClickListener {
-                    onItemClickListener.invoke(item, Event.OPEN)
-                }
-                ivDelete.setOnClickListener {
-                    onItemClickListener.invoke(item, Event.DELETE)
-                }
+            tvWord.text = item.word
+            if (item.time == 0L)
+                tvTime.visibility = View.GONE
+            else
+                tvTime.text = timeFormatter.format(item.time)
+            root.setOnClickListener {
+                onItemClickListener.invoke(item, Event.OPEN)
+            }
+            ivDelete.setOnClickListener {
+                onItemClickListener.invoke(item, Event.DELETE)
             }
         }
     }
@@ -52,11 +57,7 @@ class HistoryAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(
-            ItemHistoryBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
+            LayoutInflater.from(parent.context).inflate(R.layout.item_history, parent, false)
         )
 
     override fun onBindViewHolder(holder: HistoryAdapter.ViewHolder, position: Int) =
