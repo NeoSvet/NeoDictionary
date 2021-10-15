@@ -10,3 +10,5 @@ rootProject.name = "NeoDictionary"
 include ':app'
 include ':neoflickr'
 include ':utils'
+include ':dictionary'
+include ':widget'
