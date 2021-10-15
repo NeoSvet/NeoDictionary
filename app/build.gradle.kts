@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    kotlin("kapt")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -33,8 +35,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":widget"))
-    implementation(project(":dictionary"))
     implementation(project(":neoflickr"))
     implementation(project(":utils"))
     implementation(Basic.core_ktx)
@@ -42,13 +42,17 @@ dependencies {
     implementation(Basic.material)
     implementation(Basic.constraint)
     implementation(Basic.splashscreen)
+    implementation(RxJava.rxjava)
     implementation(RxJava.rxandroid)
-    implementation(Room.runtime)
-    implementation(Room.room_ktx)
+    implementation(Retrofit.core)
+    implementation(Retrofit.converter_gson)
+    implementation(Retrofit.adapter_rxjava)
     implementation(Koin.core)
     implementation(Koin.koin_android)
     implementation(Koin.compat)
-    implementation(Coroutines.core)
-    implementation(Coroutines.c_android)
+    implementation(Room.runtime)
+    implementation(Room.room_ktx)
+    kapt(Room.kapt_compiler)
     implementation(Cicerone.core)
+    implementation(Coil.core)
 }
