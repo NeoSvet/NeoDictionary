@@ -4,15 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import geekbrains.ru.utils.network.OnlineObserver
 import ru.neosvet.neoflickr.R
-import ru.neosvet.neoflickr.databinding.FragmentImagesBinding
 import ru.neosvet.neoflickr.entries.ImagesState
 import ru.neosvet.neoflickr.view.list.ImagesAdapter
 import ru.neosvet.neoflickr.viewmodel.ImagesViewModel
+import ru.neosvet.utils.viewById
 
 class ImagesFragment : Fragment() {
     companion object {
@@ -25,16 +28,21 @@ class ImagesFragment : Fragment() {
             }
     }
 
-    private var binding: FragmentImagesBinding? = null
     private var errorBar: Snackbar? = null
+    private val rvImages by viewById<RecyclerView>(R.id.rv_images)
+    private val progressBar by viewById<ProgressBar>(R.id.progressBar)
     private val model: ImagesViewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(ImagesViewModel::class.java)
     }
+    private val onlineObserver: OnlineObserver by lazy {
+        OnlineObserver(requireContext())
+    }
     private val resultObserver =
-        Observer<ImagesState.Model> { result ->
-            when (result.state) {
-                ImagesState.State.IMAGES -> onImages(result as ImagesState.Images)
-                ImagesState.State.ERROR -> onError(result as ImagesState.Error)
+        Observer<ImagesState.Model> { response ->
+            when (response) {
+                is ImagesState.Start -> errorBar?.dismiss()
+                is ImagesState.Images -> onImages(response)
+                is ImagesState.Error -> onError(response)
             }
         }
 
@@ -42,16 +50,15 @@ class ImagesFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = FragmentImagesBinding.inflate(inflater, container, false).let {
-        binding = it
-        it.root
+    ): View? {
+        return inflater.inflate(R.layout.fragment_images, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         arguments?.let {
             it.getString(ARG_QUERY)?.let {
-                model.search(it)
+                model.search(it, onlineObserver)
             }
         }
     }
@@ -66,19 +73,14 @@ class ImagesFragment : Fragment() {
         super.onPause()
     }
 
-    override fun onDestroy() {
-        binding = null
-        super.onDestroy()
-    }
-
-    private fun onImages(images: ImagesState.Images) = binding?.run {
+    private fun onImages(images: ImagesState.Images) {
         progressBar.visibility = View.GONE
         val adapter = ImagesAdapter(images.urls)
         rvImages.adapter = adapter
         adapter.notifyDataSetChanged()
     }
 
-    private fun onError(result: ImagesState.Error) = binding?.run {
+    private fun onError(result: ImagesState.Error) {
         progressBar.visibility = View.GONE
         val msg = getString(R.string.error) + ": " + result.error.message
         errorBar = Snackbar.make(

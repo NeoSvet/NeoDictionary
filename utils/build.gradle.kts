@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 30
 
     defaultConfig {
         minSdk = 23
-        targetSdk = 31
+        targetSdk = 30
     }
 
     buildTypes {
@@ -30,14 +30,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":utils"))
     implementation(Basic.core_ktx)
     implementation(Basic.appcompat)
-    implementation(Basic.material)
-    implementation(RxJava.rxjava)
-    implementation(RxJava.rxandroid)
-    implementation(Retrofit.core)
-    implementation(Retrofit.converter_gson)
-    implementation(Retrofit.adapter_rxjava)
-    implementation(Coil.core)
+    implementation(Coroutines.core)
+    implementation(Coroutines.c_android)
 }

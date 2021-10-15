@@ -1,21 +1,15 @@
 package ru.neosvet.neoflickr.entries
 
 object ImagesState {
-    interface Model {
-        val state: State
-    }
+    interface Model
 
-    enum class State {
-        IMAGES, ERROR
-    }
+    object Start : Model
 
     data class Images(
-        override val state: State = State.IMAGES,
         val urls: List<String>
     ) : Model
 
     data class Error(
-        override val state: State = State.ERROR,
         val error: Throwable
     ) : Model
 }
